@@ -9,6 +9,7 @@ html, body, #game-layer {
     justify-content: center;
     align-items: flex-start;
     overflow: hidden;
+    cursor: crosshair;
 }
 
 #canvas {
