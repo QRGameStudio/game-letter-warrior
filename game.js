@@ -3,6 +3,7 @@ let canvasWidth;
 let canvasHeight;
 let ctx = canvas ? canvas.canvas.getContext('2d') : null;
 let objects = [];
+let objectToAdd = [];
 let lastMousePoint = null;
 const abs = Math.abs;
 const min = Math.min;
@@ -22,7 +23,9 @@ function draw() {
     ctx.fillStyle = '#000';
     ctx.globalAlpha = 1;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    objects = objects.filter((o, i) => o.draw(i));
+    let objectsFiltered = objects.filter((o, i) => o.draw(i));
+    objects = [...objectToAdd, ...objectsFiltered];
+    objectToAdd.length = 0;
     window.requestAnimationFrame(draw);
 }
 
@@ -44,41 +47,47 @@ function MousePoint(x, y, c=null) {
     objects.push(this);
 }
 
-function GameObject(content, x, y, speedX, speedY) {
+function GameObject(content, x, y, speedX, speedY, hitVector=null) {
     let gravity = 0.05;
-    let hit = false;
+    let hit = hitVector !== null ? hitVector : [];
     this.m = false; // is NOT mouse event
     this.draw = (i) => {
         const size = objectSize();
         ctx.globalAlpha = 1;
         ctx.font = `${size}px monospace`;
-        if (!hit) {
-            const sizeX = ctx.measureText(content).width;
-            const sizeQuarter = min(size, sizeX) / 4;
-            const centerX = (X(x) + sizeX / 2);
-            const centerY = (Y(y) - size / 2);
-            const cross = objects.slice(i).find(
+        const sizeX = ctx.measureText(content).width;
+        const centerX = (X(x) + sizeX / 2);
+        const centerY = (Y(y) - size / 2);
+        const sizeHalf = min(size, sizeX) / 2;
+        const sizeQuarter = sizeHalf / 2;
+        if (!hit.length) {
+            const crossIndex = objects.slice(i).findIndex(
                 (o) => o.m && abs(centerX - X(o.x)) < sizeQuarter && abs(centerY - Y(o.y)) < sizeQuarter
             );
-            if (cross) {
-                hit = true;
-                speedX = 0;
-                speedY = 0;
+            if (crossIndex !== -1) {
+                new GameObject(content, x, y, -0.3, 0, [true]);
+                new GameObject(content, x, y, 0.3, 0, [false]);
+                return false;
             }
-            ctx.globalAlpha = 1;
-            ctx.fillStyle = '#0f0';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
-            ctx.fill();
         }
-        ctx.fillStyle = hit ? '#f00' : '#fff';
+        ctx.save();
+        ctx.fillStyle = '#fff';
         ctx.fillText(content, X(x), Y(y));
+        if (hit.length) {
+            ctx.fillStyle = '#000';
+            if (hit[0]) {
+                ctx.fillRect(centerX, Y(y) - size * 1.5, sizeHalf, size * 2);
+            } else {
+                ctx.fillRect(X(x), Y(y) - size * 1.5, sizeHalf, size * 2);
+            }
+        }
+        ctx.restore();
         x += speedX;
         y += speedY;
         speedY += gravity;
         return y < 100;
     }
-    objects.push(this);
+    objectToAdd.push(this);
 }
 
 function gameEntryPoint() {
@@ -117,7 +126,6 @@ function addMousePoint(x, y) {
             if (ny === null || nx === null) {
                 break;
             }
-            console.log('adding');
             mousePoint = new MousePoint(nx ? nx : mousePoint.x, ny ? ny : mousePoint.y, '#00f');
         }
     }
