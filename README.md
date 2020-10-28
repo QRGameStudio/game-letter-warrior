@@ -1,3 +1,3 @@
 # Uni Warrior
 
-A letter cutting game
+A letter cutting game :)

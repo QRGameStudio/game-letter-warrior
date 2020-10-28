@@ -15,7 +15,6 @@ let storage = null;
 const abs = Math.abs;
 const min = Math.min;
 const sign = Math.sign;
-const floor = Math.floor;
 
 /**
  * All coordinates are relative to the size of the viewport
@@ -124,7 +123,8 @@ function gameEntryPoint() {
    canvas.onmouseleave = () => lastMousePoint = null;
    canvas.ontouchend = () => lastMousePoint = null;
    // canvas.onclick = () => launchObject();
-   setInterval(() => launchObject(), 500);
+
+   launchObject();
 
    storage = new GStorage('game.uni-warrior');
    storage.get('hs', null).then((hs) => {
@@ -169,7 +169,7 @@ function objectSize() {
 function launchObject() {
     let bad;
     let letter;
-    if (random(0, 10) < 1) {
+    if (random(0, Math.max(40 - (score / 10), 4)) < 1) {
         letter = '@';
         bad = true;
     } else {
@@ -179,6 +179,8 @@ function launchObject() {
 
     new GameObject(letter, 50, 99, random(-0.6, 0.6), random(-1.5, -4), bad);
     if (currentLetter >= MESSAGE.length) currentLetter = 0;
+
+    setTimeout(() => launchObject(), Math.max(200, 500-score));
 }
 
 function random(from, to) {
