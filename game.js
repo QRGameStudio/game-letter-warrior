@@ -1,3 +1,5 @@
+const cutted = ['X', 'A', 'V', 'W', 'O', 'P'];
+
 let canvas = document.getElementById('canvas') || null;
 let canvasWidth;
 let canvasHeight;
@@ -8,6 +10,7 @@ let lastMousePoint = null;
 const abs = Math.abs;
 const min = Math.min;
 const sign = Math.sign;
+const floor = Math.floor;
 
 /**
  * All coordinates are relative to the size of the viewport
@@ -138,7 +141,7 @@ function objectSize() {
 }
 
 function launchObject() {
-    new GameObject('X', 50, 99, random(-0.6, 0.6), random(-1.5, -4));
+    new GameObject(cutted[floor(random(0, cutted.length))], 50, 99, random(-0.6, 0.6), random(-1.5, -4));
 }
 
 function random(from, to) {
