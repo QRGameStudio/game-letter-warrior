@@ -1,4 +1,5 @@
-const cutted = ['X', 'A', 'V', 'W', 'O', 'P'];
+const MESSAGE = 'QRGAMESTUDIO'.split('');
+let currentLetter = 0;
 
 let canvas = document.getElementById('canvas') || null;
 let canvasWidth;
@@ -10,7 +11,6 @@ let lastMousePoint = null;
 const abs = Math.abs;
 const min = Math.min;
 const sign = Math.sign;
-const floor = Math.floor;
 
 /**
  * All coordinates are relative to the size of the viewport
@@ -32,14 +32,14 @@ function draw() {
     window.requestAnimationFrame(draw);
 }
 
-function MousePoint(x, y, c=null) {
+function MousePoint(x, y) {
     let alpha = 1;
     this.m = true; // is mouse event
     this.x = x;
     this.y = y;
 
     this.draw = () => {
-        ctx.fillStyle = c ? c : '#fff';
+        ctx.fillStyle = '#fff';
         ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(X(x), Y(y), 5, 0, Math.PI * 2);
@@ -129,7 +129,7 @@ function addMousePoint(x, y) {
             if (ny === null || nx === null) {
                 break;
             }
-            mousePoint = new MousePoint(nx ? nx : mousePoint.x, ny ? ny : mousePoint.y, '#00f');
+            mousePoint = new MousePoint(nx ? nx : mousePoint.x, ny ? ny : mousePoint.y);
         }
     }
 
@@ -141,7 +141,8 @@ function objectSize() {
 }
 
 function launchObject() {
-    new GameObject(cutted[floor(random(0, cutted.length))], 50, 99, random(-0.6, 0.6), random(-1.5, -4));
+    new GameObject(MESSAGE[currentLetter++], 50, 99, random(-0.6, 0.6), random(-1.5, -4));
+    if (currentLetter >= MESSAGE.length) currentLetter = 0;
 }
 
 function random(from, to) {
