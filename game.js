@@ -8,9 +8,14 @@ let ctx = canvas ? canvas.canvas.getContext('2d') : null;
 let objects = [];
 let objectToAdd = [];
 let lastMousePoint = null;
+let score = 0;
+let scoreEl = null;
+let maxScore = null;
+let storage = null;
 const abs = Math.abs;
 const min = Math.min;
 const sign = Math.sign;
+const floor = Math.floor;
 
 /**
  * All coordinates are relative to the size of the viewport
@@ -32,6 +37,12 @@ function draw() {
     window.requestAnimationFrame(draw);
 }
 
+function showScore() {
+    if (scoreEl === null)
+        scoreEl = document.getElementById('score');
+    scoreEl.innerText = maxScore !== null ? `${score} (${maxScore})` : `${score}`;
+}
+
 function MousePoint(x, y) {
     let alpha = 1;
     this.m = true; // is mouse event
@@ -50,7 +61,7 @@ function MousePoint(x, y) {
     objects.push(this);
 }
 
-function GameObject(content, x, y, speedX, speedY, hitVector=null) {
+function GameObject(content, x, y, speedX, speedY, bad=false, hitVector=null) {
     let gravity = 0.05;
     let hit = hitVector !== null ? hitVector : [];
     this.m = false; // is NOT mouse event
@@ -68,13 +79,23 @@ function GameObject(content, x, y, speedX, speedY, hitVector=null) {
                 (o) => o.m && abs(centerX - X(o.x)) < sizeQuarter && abs(centerY - Y(o.y)) < sizeQuarter
             );
             if (crossIndex !== -1) {
-                new GameObject(content, x, y, -0.3, 0, [true]);
-                new GameObject(content, x, y, 0.3, 0, [false]);
+                new GameObject(content, x, y, -0.3, 0, bad, [true]);
+                new GameObject(content, x, y, 0.3, 0, bad, [false]);
+                if (bad) {
+                    score -= 10;
+                } else {
+                    score ++;
+                    if (score > maxScore) {
+                        maxScore = score;
+                        storage.set('hs', score);
+                    }
+                }
+                showScore();
                 return false;
             }
         }
         ctx.save();
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = bad ? '#f00' : '#fff';
         ctx.fillText(content, X(x), Y(y));
         if (hit.length) {
             ctx.fillStyle = '#000';
@@ -104,6 +125,11 @@ function gameEntryPoint() {
    canvas.ontouchend = () => lastMousePoint = null;
    // canvas.onclick = () => launchObject();
    setInterval(() => launchObject(), 500);
+
+   storage = new GStorage('game.uni-warrior');
+   storage.get('hs', null).then((hs) => {
+       if (hs !== null) maxScore = hs;
+   });
    draw();
 }
 
@@ -141,7 +167,17 @@ function objectSize() {
 }
 
 function launchObject() {
-    new GameObject(MESSAGE[currentLetter++], 50, 99, random(-0.6, 0.6), random(-1.5, -4));
+    let bad;
+    let letter;
+    if (random(0, 10) < 1) {
+        letter = '@';
+        bad = true;
+    } else {
+        bad = false;
+        letter = MESSAGE[currentLetter++];
+    }
+
+    new GameObject(letter, 50, 99, random(-0.6, 0.6), random(-1.5, -4), bad);
     if (currentLetter >= MESSAGE.length) currentLetter = 0;
 }
 
