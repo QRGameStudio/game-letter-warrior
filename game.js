@@ -56,10 +56,10 @@ function MousePoint(x, y) {
     this.y = y;
 
     this.draw = () => {
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = '#e25822';
         ctx.globalAlpha = alpha;
         ctx.beginPath();
-        ctx.arc(X(x), Y(y), 5, 0, Math.PI * 2);
+        ctx.arc(X(x), Y(y), 5 * alpha, 0, Math.PI * 2);
         ctx.fill();
         if (alpha > 0) {
             alpha -= 0.05;
