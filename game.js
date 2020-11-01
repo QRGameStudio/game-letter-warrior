@@ -29,7 +29,7 @@ const sign = Math.sign;
 let nextLaunchAt = 0;
 
 function draw() {
-    if (Date.now() >= nextLaunchAt) {
+    if (Date.now() >= nextLaunchAt && !document.hidden) {
         launchObject();
         nextLaunchAt = Date.now() + Math.max(200, 500-score);
     }
