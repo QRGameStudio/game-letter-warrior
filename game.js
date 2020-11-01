@@ -26,7 +26,14 @@ const sign = Math.sign;
  * - relX() and relY() to make absolute numbers relative
  */
 
+let nextLaunchAt = 0;
+
 function draw() {
+    if (Date.now() >= nextLaunchAt) {
+        launchObject();
+        nextLaunchAt = Date.now() + Math.max(200, 500-score);
+    }
+
     ctx.fillStyle = '#000';
     ctx.globalAlpha = 1;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -54,7 +61,9 @@ function MousePoint(x, y) {
         ctx.beginPath();
         ctx.arc(X(x), Y(y), 5, 0, Math.PI * 2);
         ctx.fill();
-        alpha -= 0.05;
+        if (alpha > 0) {
+            alpha -= 0.05;
+        }
         return alpha > 0;
     };
     objects.push(this);
@@ -118,13 +127,14 @@ function gameEntryPoint() {
    if (!ctx) {
        ctx = canvas.getContext('2d');
    }
-   canvas.onmousemove = (e) => addMousePoint(e.x, e.y);
+   canvas.onmousemove = (e) => {
+       console.log('mousemove')
+       addMousePoint(e.x, e.y);
+   }
    canvas.ontouchmove = (e) => addMousePoint(e.touches[0].clientX, e.touches[0].clientY);
    canvas.onmouseleave = () => lastMousePoint = null;
    canvas.ontouchend = () => lastMousePoint = null;
    // canvas.onclick = () => launchObject();
-
-   launchObject();
 
    storage = new GStorage('game.uni-warrior');
    storage.get('hs', null).then((hs) => {
@@ -137,7 +147,7 @@ function addMousePoint(x, y) {
     const newMousePoint = new MousePoint(relX(x), relY(y));
 
     if (lastMousePoint) {
-        const sizeQ = relY(objectSize() / 8);
+        const maxGap = relY(8);
         let mousePoint = newMousePoint;
         while (true) {
             let nx = null;
@@ -145,11 +155,11 @@ function addMousePoint(x, y) {
             const dx = mousePoint.x - lastMousePoint.x;
             const dy = mousePoint.y - lastMousePoint.y;
 
-            if (abs(dx) > sizeQ) {
-                nx = mousePoint.x - sign(dx) * sizeQ;
+            if (abs(dx) > maxGap) {
+                nx = mousePoint.x - sign(dx) * maxGap;
             }
-            if (abs(dy) > sizeQ) {
-                ny = mousePoint.y - sign(dy) * sizeQ;
+            if (abs(dy) > maxGap) {
+                ny = mousePoint.y - sign(dy) * maxGap;
             }
 
             if (ny === null || nx === null) {
@@ -179,8 +189,6 @@ function launchObject() {
 
     new GameObject(letter, 50, 99, random(-0.6, 0.6), random(-1.5, -4), bad);
     if (currentLetter >= MESSAGE.length) currentLetter = 0;
-
-    setTimeout(() => launchObject(), Math.max(200, 500-score));
 }
 
 function random(from, to) {
