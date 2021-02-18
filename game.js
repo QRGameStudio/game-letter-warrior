@@ -1,4 +1,7 @@
-const MESSAGE = 'QRGAMESTUDIO'.split('');
+// Message and bomb are decoded using GUt.ud during gameEntryPoint
+let MESSAGE = ['8J+nvfCfp7rwn5qq8J+UkfCflJLwn5eE77iP8J+Xke+4j/Cfk47wn5aK77iP8J+TmPCfk5zwn4+377iP8J+TgfCfkrDwn5OL8J+TiPCfkrM='];
+let BOMB = ['8J+Sow=='];
+
 let currentLetter = 0;
 
 let canvas = document.getElementById('canvas') || null;
@@ -103,7 +106,6 @@ function GameObject(content, x, y, speedX, speedY, bad=false, hitVector=null) {
             }
         }
         ctx.save();
-        ctx.fillStyle = bad ? '#f00' : '#fff';
         ctx.fillText(content, X(x), Y(y));
         if (hit.length) {
             ctx.fillStyle = '#000';
@@ -124,11 +126,14 @@ function GameObject(content, x, y, speedX, speedY, bad=false, hitVector=null) {
 
 function gameEntryPoint() {
    setCanvasSize();
+
+   BOMB = [...GUt.ud(BOMB[0])];
+   MESSAGE = [...GUt.ud(MESSAGE[0])];
+
    if (!ctx) {
        ctx = canvas.getContext('2d');
    }
    canvas.onmousemove = (e) => {
-       console.log('mousemove')
        addMousePoint(e.x, e.y);
    }
    canvas.ontouchmove = (e) => addMousePoint(e.touches[0].clientX, e.touches[0].clientY);
@@ -173,14 +178,14 @@ function addMousePoint(x, y) {
 }
 
 function objectSize() {
-    return Y(10);
+    return Y(7);
 }
 
 function launchObject() {
     let bad;
     let letter;
     if (random(0, Math.max(40 - (score / 10), 4)) < 1) {
-        letter = '@';
+        letter = BOMB[0];
         bad = true;
     } else {
         bad = false;
