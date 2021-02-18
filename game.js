@@ -2,6 +2,9 @@
 let MESSAGE = ['8J+nvfCfp7rwn5qq8J+UkfCflJLwn5eE77iP8J+Xke+4j/Cfk47wn5aK77iP8J+TmPCfk5zwn4+377iP8J+TgfCfkrDwn5OL8J+TiPCfkrM='];
 let BOMB = ['8J+Sow=='];
 
+let MUSIC;
+let HIT_TONE;
+
 let currentLetter = 0;
 
 let canvas = document.getElementById('canvas') || null;
@@ -94,7 +97,9 @@ function GameObject(content, x, y, speedX, speedY, bad=false, hitVector=null) {
                 new GameObject(content, x, y, 0.3, 0, bad, [false]);
                 if (bad) {
                     score -= 10;
+                    MUSIC.play('explosion');
                 } else {
+                    HIT_TONE.play();
                     score ++;
                     if (score > maxScore) {
                         maxScore = score;
@@ -129,6 +134,11 @@ function gameEntryPoint() {
 
    BOMB = [...GUt.ud(BOMB[0])];
    MESSAGE = [...GUt.ud(MESSAGE[0])];
+   MUSIC = new GSongLib();
+   HIT_TONE = new GTone('C4', 100, 70);
+
+   // noinspection JSIgnoredPromiseFromCall
+   MUSIC.play('songBLooping', -1);
 
    if (!ctx) {
        ctx = canvas.getContext('2d');
@@ -178,7 +188,7 @@ function addMousePoint(x, y) {
 }
 
 function objectSize() {
-    return Y(7);
+    return min(X(10), Y(10));
 }
 
 function launchObject() {
