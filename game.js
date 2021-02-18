@@ -39,7 +39,7 @@ function draw() {
 
     ctx.fillStyle = '#000';
     ctx.globalAlpha = 1;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     let objectsFiltered = objects.filter((o, i) => o.draw(i));
     objects = [...objectToAdd, ...objectsFiltered];
     objectToAdd.length = 0;
@@ -110,9 +110,9 @@ function GameObject(content, x, y, speedX, speedY, bad=false, hitVector=null) {
         if (hit.length) {
             ctx.fillStyle = '#000';
             if (hit[0]) {
-                ctx.fillRect(centerX, Y(y) - size * 1.5, sizeHalf, size * 2);
+                ctx.clearRect(centerX, Y(y) - size * 1.5, sizeHalf, size * 2);
             } else {
-                ctx.fillRect(X(x), Y(y) - size * 1.5, sizeHalf, size * 2);
+                ctx.clearRect(X(x), Y(y) - size * 1.5, sizeHalf, size * 2);
             }
         }
         ctx.restore();
