@@ -192,7 +192,8 @@ function launchObject() {
         letter = MESSAGE[currentLetter++];
     }
 
-    new GameObject(letter, 50, 99, random(-0.6, 0.6), random(-1.5, -4), bad);
+    new GameObject(letter, random(33, 66),
+        99, random(-0.6, 0.6), random(-1.5, -4), bad);
     if (currentLetter >= MESSAGE.length) currentLetter = 0;
 }
 
