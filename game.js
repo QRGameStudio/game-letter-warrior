@@ -3,7 +3,6 @@ let MESSAGE = ['8J+nvfCfp7rwn5qq8J+UkfCflJLwn5eE77iP8J+Xke+4j/Cfk47wn5aK77iP8J+T
 let BOMB = ['8J+Sow=='];
 
 let MUSIC;
-let HIT_TONE;
 
 let currentLetter = 0;
 
@@ -99,7 +98,7 @@ function GameObject(content, x, y, speedX, speedY, bad=false, hitVector=null) {
                     score -= 10;
                     MUSIC.play('explosion');
                 } else {
-                    HIT_TONE.play();
+                    MUSIC.play('hit');
                     score ++;
                     if (score > maxScore) {
                         maxScore = score;
@@ -135,7 +134,6 @@ function gameEntryPoint() {
    BOMB = [...GUt.ud(BOMB[0])];
    MESSAGE = [...GUt.ud(MESSAGE[0])];
    MUSIC = new GSongLib();
-   HIT_TONE = new GTone('C4', 100, 70);
 
    // noinspection JSIgnoredPromiseFromCall
    MUSIC.play('songBLooping', -1);
